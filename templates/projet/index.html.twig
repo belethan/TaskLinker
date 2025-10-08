@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Projets!{% endblock %}
+
+{% block Nompage %} Projets {% endblock %}
+{% block body %}
+    <div id="projects-container">
+        {% for projet in projets %}
+            <article class="card-project">
+                    <a href="#">
+                        <h2>{{ projet.nom }}</h2>
+                    </a>
+                    <div class="card-project-icons">
+                        <a href="#"><i class="fa-solid fa-pen"></i></a>
+                        <a href="#"><i class="fa-solid fa-trash"></i></a>
+                    </div>
+            </article>
+        {% endfor %}
+        <article class="card-project">
+            <a href="#">
+                <i class="fa-solid fa-circle-plus add-project-icon"> </i>
+                <h2>Ajouter un projet</h2>
+            </a>
+        </article>
+    </div>
+{% endblock %}
