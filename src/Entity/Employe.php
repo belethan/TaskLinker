@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
+use App\Enum\typeContrat;
 use App\Repository\EmployeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Enum\statutTache;
+
 
 #[ORM\Entity(repositoryClass: EmployeRepository::class)]
 class Employe
@@ -27,8 +28,8 @@ class Employe
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $date_entree = null;
 
-    #[ORM\Column(enumType: statutTache::class)]
-    private ?statutTache $statut ;
+    #[ORM\Column(enumType: typeContrat::class)]
+    private ?typeContrat $typeContrat ;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -91,12 +92,12 @@ class Employe
 
     public function getStatut(): ?string
     {
-        return $this->statut;
+        return $this->typeContrat;
     }
 
-    public function setStatut(statutTache $statut): self
+    public function setStatut(typeContrat $typeContrat): self
     {
-        $this->statut = $statut;
+        $this->typeContrat = $typeContrat;
 
         return $this;
     }
