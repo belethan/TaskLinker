@@ -16,28 +16,56 @@ class EmployeRepository extends ServiceEntityRepository
         parent::__construct($registry, Employe::class);
     }
 
-    //    /**
-    //     * @return Employe[] Returns an array of Employe objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('e.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Retourne les employés non affectés à d'autres projets
+     * ou déjà liés à un projet donné.
+     * Voici la requete construite par Doctrine :
+     *
+     * SELECT e.*, p.*
+     * FROM employe e
+     * LEFT JOIN employe_projet ep ON ep.employe_id = e.id
+     * LEFT JOIN projet p ON p.id = ep.projet_id
+     * WHERE p.id IS NULL OR p.id = :pid
+     */
+    public function findEmployesDisponiblesOuAffectes(?int $projetId): array
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->leftJoin('e.projets', 'p')
+            ->addSelect('p');
 
-    //    public function findOneBySomeField($value): ?Employe
-    //    {
-    //        return $this->createQueryBuilder('e')
-    //            ->andWhere('e.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($projetId) {
+            $qb->where('p.id IS NULL OR p.id = :pid')
+                ->setParameter('pid', $projetId);
+        } else {
+            $qb->where('p.id IS NULL');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    // Version SQL optimisée pour AJAX / Select2
+    public function AjaxfindEmployesDisponiblesOuAffectes(?int $projetId): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+            SELECT e.id, e.nom
+            FROM employe e
+            WHERE e.id NOT IN (
+                SELECT ep.employe_id
+                FROM employe_projet ep
+                WHERE ep.projet_id <> :pid
+            )
+            OR e.id IN (
+                SELECT ep.employe_id
+                FROM employe_projet ep
+                WHERE ep.projet_id = :pid
+            )
+            ORDER BY e.nom ASC
+        ";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue('pid', $projetId ?? 0);
+        return $stmt->executeQuery()->fetchAllAssociative();
+    }
 }

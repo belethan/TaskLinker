@@ -8,9 +8,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Tache;
 
 
-#[ORM\Entity]
 #[ORM\Table(name: 'employe')]
 #[ORM\Entity(repositoryClass: EmployeRepository::class)]
 class Employe
@@ -49,12 +49,19 @@ class Employe
     private Collection $projets;
 
     /**
+     * @var Collection<int, tache>
+     */
+    #[ORM\OneToMany(mappedBy: 'employe', targetEntity: Taches::class, cascade: ['persist', 'remove'])]
+    private Collection $taches;
+
+    /**
      * Déclaration des Getter et Setter
      */
 
     public function __construct()
     {
         $this->projets = new ArrayCollection();
+        $this->taches = new ArrayCollection();
     }
     public function getId(): ?int
     {
@@ -155,6 +162,7 @@ class Employe
     }
 
     /**
+     * Relation entre Employe et Projet
      * @return Collection<int, Projet>
      */
     public function getProjets(): Collection
@@ -166,6 +174,7 @@ class Employe
     {
         if (!$this->projets->contains($projet)) {
             $this->projets->add($projet);
+            $projet->addEmploye($this);
         }
 
         return $this;
@@ -177,4 +186,34 @@ class Employe
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Taches>
+     */
+    public function getTaches(): Collection
+    {
+        return $this->taches;
+    }
+
+    public function addTaches(Taches $tache): static
+    {
+        if (!$this->taches->contains($tache)) {
+            $this->taches->add($tache);
+            $tache->setEmploye($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTaches(Taches $tache): static
+    {
+        if ($this->taches->removeElement($tache)) {
+            if ($tache->getEmploye() === $this) {
+                $tache->setEmploye(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

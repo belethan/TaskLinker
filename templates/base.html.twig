@@ -21,12 +21,12 @@
     <body>
         <div id="main-container">
             <nav>
-                <a href="{{ path("projet") }}" id="logo">
+                <a href="{{ path("projet.index") }}" id="logo">
                     <img src="{{ asset('./images/logo.png') }}" alt="Logo TaskLinker" />"
                 </a>
                 <ul id="main-menu">
                     <li class="{{ app.current_route starts with 'projet' ? 'active': '' }}">
-                        <a href="{{ path("projet") }} ">
+                        <a href="{{ path("projet.index") }} ">
                             <i class="fa-solid fa-list-check"></i> Projets
                         </a>
                     </li>

@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Projet{% endblock %}
+
+{% block Nompage %} <strong>{{ action }}</strong> {% endblock %}
+{% block body %}
+    {{ form_start(formProjet) }}
+
+    {{ form_row(formProjet.nom) }}
+    {{ form_row(formProjet.employes) }}
+
+    {{ form_row(formProjet.submit) }}
+
+    {{ form_end(formProjet) }}
+{% endblock %}

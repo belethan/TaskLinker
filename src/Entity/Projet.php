@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 
-#[ORM\Entity]
+
 #[ORM\Table(name: 'projet')]
 #[ORM\Entity(repositoryClass: ProjetRepository::class)]
 class Projet
@@ -33,9 +33,16 @@ class Projet
     #[ORM\ManyToMany(targetEntity: Employe::class, mappedBy: 'projets')]
     private Collection $employes;
 
+    /**
+     * @var Collection<int, Taches>
+     */
+    #[ORM\OneToMany(targetEntity: Taches::class, mappedBy: 'projet')]
+    private Collection $taches;
+
     public function __construct()
     {
         $this->employes = new ArrayCollection();
+        $this->taches = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -80,6 +87,7 @@ class Projet
     }
 
     /**
+     * gestion des employes dans le projet
      * @return Collection<int, Employe>
      */
     public function getEmployes(): Collection
@@ -101,6 +109,36 @@ class Projet
     {
         if ($this->employes->removeElement($employe)) {
             $employe->removeProjet($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Taches>
+     */
+    public function getTaches(): Collection
+    {
+        return $this->taches;
+    }
+
+    public function addTach(Taches $tach): static
+    {
+        if (!$this->taches->contains($tach)) {
+            $this->taches->add($tach);
+            $tach->setProjet($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTach(Taches $tach): static
+    {
+        if ($this->taches->removeElement($tach)) {
+            // set the owning side to null (unless already changed)
+            if ($tach->getProjet() === $this) {
+                $tach->setProjet(null);
+            }
         }
 
         return $this;

@@ -512,6 +512,13 @@ form .select2-container--default .select2-selection--multiple .select2-selection
     }
 }
 
+.select2-result-employe {
+    padding: 6px;
+}
+
+.select2-result-employe__title {
+    font-weight: 500;
+}
 @media (max-width: 668px) {
     div#content {
         padding: 30px;
