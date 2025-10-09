@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Employé{% endblock %}
+
+{% block Nompage %} <strong>{{ employe.nom ~" "~employe.prenom }}</strong> {% endblock %}
+{% block body %}
+    {{ form_start(formEmploye) }}
+
+    {{ form_row(formEmploye.nom) }}
+    {{ form_row(formEmploye.prenom) }}
+    {{ form_row(formEmploye.email) }}
+
+    <div class="form-flex">
+        {{ form_row(formEmploye.dateEntree) }}
+        {{ form_row(formEmploye.typeContrat) }}
+    </div>
+
+    {{ form_row(formEmploye.submit) }}
+
+    {{ form_end(formEmploye) }}
+{% endblock %}

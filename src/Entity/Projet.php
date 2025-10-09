@@ -3,8 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\ProjetRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+
+#[ORM\Entity]
+#[ORM\Table(name: 'projet')]
 #[ORM\Entity(repositoryClass: ProjetRepository::class)]
 class Projet
 {
@@ -21,6 +26,17 @@ class Projet
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $created_At = null;
+
+    /**
+     * @var Collection<int, Employe>
+     */
+    #[ORM\ManyToMany(targetEntity: Employe::class, mappedBy: 'projets')]
+    private Collection $employes;
+
+    public function __construct()
+    {
+        $this->employes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -59,6 +75,33 @@ class Projet
     public function setCreatedAt(?\DateTimeImmutable $created_At): static
     {
         $this->created_At = $created_At;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Employe>
+     */
+    public function getEmployes(): Collection
+    {
+        return $this->employes;
+    }
+
+    public function addEmploye(Employe $employe): static
+    {
+        if (!$this->employes->contains($employe)) {
+            $this->employes->add($employe);
+            $employe->addProjet($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEmploye(Employe $employe): static
+    {
+        if ($this->employes->removeElement($employe)) {
+            $employe->removeProjet($this);
+        }
 
         return $this;
     }

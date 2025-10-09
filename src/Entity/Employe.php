@@ -5,9 +5,13 @@ namespace App\Entity;
 use App\Enum\typeContrat;
 use App\Repository\EmployeRepository;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 
+#[ORM\Entity]
+#[ORM\Table(name: 'employe')]
 #[ORM\Entity(repositoryClass: EmployeRepository::class)]
 class Employe
 {
@@ -25,11 +29,11 @@ class Employe
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $date_entree = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $date_entree = null;
 
-    #[ORM\Column(enumType: typeContrat::class)]
-    private ?typeContrat $typeContrat ;
+    #[ORM\Column(length: 15, enumType: typeContrat::class, nullable: true)]
+    private ?typeContrat $typeContrat = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -37,6 +41,21 @@ class Employe
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    /**
+     * @var Collection<int, Projet>
+     */
+    #[ORM\ManyToMany(targetEntity: Projet::class, inversedBy: 'employes')]
+    #[ORM\JoinTable(name: 'employe_projet')]
+    private Collection $projets;
+
+    /**
+     * Déclaration des Getter et Setter
+     */
+
+    public function __construct()
+    {
+        $this->projets = new ArrayCollection();
+    }
     public function getId(): ?int
     {
         return $this->id;
@@ -90,12 +109,12 @@ class Employe
         return $this;
     }
 
-    public function getStatut(): ?string
+    public function getTypeContrat(): ?typeContrat
     {
         return $this->typeContrat;
     }
 
-    public function setStatut(typeContrat $typeContrat): self
+    public function setTypeContrat(?typeContrat $typeContrat): self
     {
         $this->typeContrat = $typeContrat;
 
@@ -122,6 +141,39 @@ class Employe
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    // Champ calculé (non persisté en base)
+    public function getInitiales(): string
+    {
+        $initialeNom = $this->nom ? mb_substr($this->nom, 0, 1) : '';
+        $initialePrenom = $this->prenom ? mb_substr($this->prenom, 0, 1) : '';
+
+        return mb_strtoupper($initialeNom . $initialePrenom);
+    }
+
+    /**
+     * @return Collection<int, Projet>
+     */
+    public function getProjets(): Collection
+    {
+        return $this->projets;
+    }
+
+    public function addProjet(Projet $projet): static
+    {
+        if (!$this->projets->contains($projet)) {
+            $this->projets->add($projet);
+        }
+
+        return $this;
+    }
+
+    public function removeProjet(Projet $projet): static
+    {
+        $this->projets->removeElement($projet);
 
         return $this;
     }
