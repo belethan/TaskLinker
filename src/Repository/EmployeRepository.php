@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Employe;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -27,7 +28,7 @@ class EmployeRepository extends ServiceEntityRepository
      * LEFT JOIN projet p ON p.id = ep.projet_id
      * WHERE p.id IS NULL OR p.id = :pid
      */
-    public function findEmployesDisponiblesOuAffectes(?int $projetId): array
+    public function findEmployesDisponiblesOuAffectes(?int $projetId): QueryBuilder
     {
         $qb = $this->createQueryBuilder('e')
             ->leftJoin('e.projets', 'p')
@@ -40,7 +41,7 @@ class EmployeRepository extends ServiceEntityRepository
             $qb->where('p.id IS NULL');
         }
 
-        return $qb->getQuery()->getResult();
+        return $qb;
     }
 
     // Version SQL optimisée pour AJAX / Select2

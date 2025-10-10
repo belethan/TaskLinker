@@ -36,7 +36,7 @@ final class ProjetController extends AbstractController
 
         $form = $this->createForm(ProjectType::class, $projet, [
             'ajax_url' => $this->generateUrl('ajax_employe_list'),
-            'employes_retenu' => [], // aucun employé pré-sélectionné
+            'employes_selectiones' =>  [], // aucun employé pré-sélectionné
         ]);
 
         $form->handleRequest($request);
@@ -49,25 +49,21 @@ final class ProjetController extends AbstractController
         }
 
         return $this->render('projet/addMody.html.twig', [
-            'form' => $form,
+            'formProjet' => $form,
+            'action' => 'Nouveau Projet',
             'projet' => $projet,
         ]);
     }
 
-    #[Route('/Projet/{id}/edit', name: 'projet.edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Projet $projet, EntityManagerInterface $em): Response
+    #[Route('/Projet/{id}/edit', name: 'projet.edit',requirements: ['id' => '\d+'])]
+    public function edit(Projet $projet, Request $request, EntityManagerInterface $em): Response
     {
-        // Préparer les employés déjà sélectionnés pour l'affichage initial
-        $employesSelectiones = [];
-        foreach ($projet->getEmployes() as $employe) {
-            $employesSelectiones[$employe->getId()] = $employe;
-        }
-
         $form = $this->createForm(ProjectType::class, $projet, [
             'projet_id' => $projet->getId(),
-            'ajax_url' => $this->generateUrl('api_employes_disponibles'),
-            'employes_selectiones' => $employesSelectiones,
+            'ajax_url' => $this->generateUrl('ajax_employe_list', ['projetId' => $projet->getId()]),
+            'employes_selectiones' => $projet->getEmployes()->toArray(),
         ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -78,9 +74,10 @@ final class ProjetController extends AbstractController
         }
 
         return $this->render('projet/addMody.html.twig', [
+            'formProjet' => $form,
             'projet' => $projet,
             'action' => 'Modifier',
-            'formProjet' => $form->createView(),
+
         ]);
     }
 
@@ -89,7 +86,7 @@ final class ProjetController extends AbstractController
     public function ajaxEmployeList(?int $projetId, EmployeRepository $repo, Request $request): JsonResponse
     {
         $term = $request->query->get('q');
-        $employes = $repo->findEmployesDisponiblesOuAffectes($projetId);
+        $employes = $repo->AjaxfindEmployesDisponiblesOuAffectes($projetId);
 
         if ($term) {
             $employes = array_filter($employes, static fn($e) => stripos($e['nom'], $term) !== false);
