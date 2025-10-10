@@ -46,53 +46,107 @@ final class EmployeController extends AbstractController
         ]);
     }
 
-    #[Route('/api/employes/disponibles', name: 'api_employes_disponibles', methods: ['GET'])]
-    public function getEmployesDisponibles(
+//    #[Route('/api/employes/disponibles', name: 'api_employes_disponibles', methods: ['GET'])]
+//    public function getEmployesDisponibles(
+//        Request $request,
+//        EmployeRepository $employeRepository
+//    ): JsonResponse
+//    {
+//        $search = $request->query->get('q', '');
+//        $projetId = $request->query->get('projet_id', null);
+//
+//        $qb = $employeRepository->createQueryBuilder('e')
+//            ->leftJoin('e.projets', 'p');
+//
+//        // Filtrer les employés déjà affectés à d'autres projets
+//        if ($projetId) {
+//            // En mode édition : exclure les employés affectés à d'autres projets
+//            // mais inclure ceux déjà affectés à CE projet
+//            $qb->andWhere('p.id IS NULL OR p.id = :projetId')
+//                ->setParameter('projetId', $projetId);
+//        } else {
+//            // En mode création : exclure tous les employés déjà affectés
+//            $qb->andWhere('p.id IS NULL');
+//        }
+//
+//        // Recherche par nom ou prénom
+//        if (!empty($search)) {
+//            $qb->andWhere('e.nom LIKE :search OR e.prenom LIKE :search')
+//                ->setParameter('search', '%' . $search . '%');
+//        }
+//
+//        $qb->orderBy('e.nom', 'ASC')
+//            ->addOrderBy('e.prenom', 'ASC')
+//            ->setMaxResults(50); // Limiter les résultats
+//
+//        $employes = $qb->getQuery()->getResult();
+//
+//        // Formater pour Select2
+//        $results = [];
+//        foreach ($employes as $employe) {
+//            $results[] = [
+//                'id' => $employe->getId(),
+//                'text' => $employe->getNom() . ' ' . $employe->getPrenom(),
+//            ];
+//        }
+//        return $this->json([
+//            'results' => $results,
+//            'pagination' => ['more' => false]
+//        ]);
+//    }
+
+// --- AJAX pour Select2 (liste des employés filtrée) ---
+    #[Route('/ajax/employes/{projetId?}', name: 'ajax_employe_list')]
+    public function ajaxEmployeList(
+        ?int $projetId,
         Request $request,
-        EmployeRepository $employeRepository
-    ): JsonResponse
-    {
-        $search = $request->query->get('q', '');
-        $projetId = $request->query->get('projet_id', null);
+        EmployeRepository $repo
 
-        $qb = $employeRepository->createQueryBuilder('e')
-            ->leftJoin('e.projets', 'p');
+    ): JsonResponse {
+        $term = $request->query->get('q');
+        // récupération des employés via QueryBuilder
+        $qb = $repo->findEmployesDisponiblesOuAffectes($projetId, $term);
+        $employes = $qb->getQuery()->getResult();
 
-        // Filtrer les employés déjà affectés à d'autres projets
-        if ($projetId) {
-            // En mode édition : exclure les employés affectés à d'autres projets
-            // mais inclure ceux déjà affectés à CE projet
-            $qb->andWhere('p.id IS NULL OR p.id = :projetId')
-                ->setParameter('projetId', $projetId);
-        } else {
-            // En mode création : exclure tous les employés déjà affectés
-            $qb->andWhere('p.id IS NULL');
+        $results = [];
+        foreach ($employes as $e) {
+            $results[] = [
+                'id' => $e->getId(),
+                'text' => $e->getNom() . ' ' . $e->getPrenom()
+            ];
         }
 
-        // Recherche par nom ou prénom
-        if (!empty($search)) {
-            $qb->andWhere('e.nom LIKE :search OR e.prenom LIKE :search')
-                ->setParameter('search', '%' . $search . '%');
+        // Récupérer les IDs à exclure (déjà sélectionnés côté client)
+       /* $excludeIds = $request->query->all('exclude_ids');
+        if (!is_array($excludeIds)) {
+            $excludeIds = [];
+        }
+        $excludeIds = array_filter($excludeIds, fn($id) => is_numeric($id));
+
+        // QueryBuilder : employés libres ou déjà liés au projet
+        $qb = $repo->findEmployesDisponiblesOuAffectes($projetId);
+
+        // Filtrage par recherche texte
+        if (!empty($term)) {
+            $qb->andWhere('LOWER(e.nom) LIKE LOWER(:term) OR LOWER(e.prenom) LIKE LOWER(:term)')
+                ->setParameter('term', '%' . $term . '%');
         }
 
-        $qb->orderBy('e.nom', 'ASC')
-            ->addOrderBy('e.prenom', 'ASC')
-            ->setMaxResults(50); // Limiter les résultats
+        // Exclusion des IDs déjà sélectionnés
+        if (!empty($excludeIds)) {
+            $qb->andWhere('e.id NOT IN (:excludeIds)')
+                ->setParameter('excludeIds', $excludeIds);
+        }
 
         $employes = $qb->getQuery()->getResult();
 
-        // Formater pour Select2
-        $results = [];
-        foreach ($employes as $employe) {
-            $results[] = [
-                'id' => $employe->getId(),
-                'text' => $employe->getNom() . ' ' . $employe->getPrenom(),
-            ];
-        }
-        return $this->json([
-            'results' => $results,
-            'pagination' => ['more' => false]
-        ]);
+        // Format attendu par Select2
+        $results = array_map(fn($employe) => [
+            'id' => $employe->getId(),
+            'text' => $employe->getNom() . ' ' . $employe->getPrenom(),
+        ], $employes);*/
+
+        return new JsonResponse(['results' => $results]);
     }
 
 }

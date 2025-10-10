@@ -5,12 +5,22 @@ $(document).ready(function() {
         const $select = $(this);
         const ajaxUrl = $select.data('ajax-url');
         const projetId = $select.data('projet-id');
+        //const selectedIds = $select.val() || [];
 
         // Récupère les IDs déjà sélectionnés pour éviter doublons dans l'AJAX
         let selectedIds = [];
         $select.find('option:selected').each(function() {
             if ($(this).val()) {
                 selectedIds.push($(this).val());
+            }
+        });
+
+        // Ajouter explicitement les options pré-sélectionnées (éviter doublons)
+        selectedIds.forEach(id => {
+            const text = $select.find(`option[value='${id}']`).text();
+            if ($select.find(`option[value='${id}']`).length === 0) {
+                const option = new Option(text, id, true, true);
+                $select.append(option);
             }
         });
 
@@ -22,7 +32,7 @@ $(document).ready(function() {
             ajax: {
                 url: ajaxUrl,
                 dataType: 'json',
-                delay: 250,
+                delay: 150,
                 data: function(params) {
                     return {
                         q: params.term || '',
@@ -38,20 +48,15 @@ $(document).ready(function() {
             },
         });
 
-        // Pré-sélectionner les employés existants (déjà liés au projet)
-        $select.find('option:selected').each(function() {
-            const val = $(this).val();
-            const text = $(this).text();
-            if (val) {
-                // Crée une option pour Select2 si elle n'existe pas encore
-                if ($select.find(`option[value='${val}']`).length === 0) {
-                    const option = new Option(text, val, true, true);
-                    $select.append(option);
-                }
-            }
-        });
-
-        // Déclenche le rendu pour Select2
+        // --- Déclencher rendu initial ---
         $select.trigger('change.select2');
+
+        // --- Quand un tag est supprimé, il devient à nouveau sélectionnable ---
+        $select.on('select2:unselect', function(e) {
+            const removedId = e.params.data.id;
+            // Retirer l’ID supprimé de selectedIds pour qu’il soit à nouveau disponible
+            selectedIds = selectedIds.filter(id => id != removedId);
+            $(this).trigger('change.select2');
+        });
     });
-});
+ });

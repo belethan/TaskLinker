@@ -71,7 +71,7 @@ final class ProjetController extends AbstractController
             $this->addFlash('success', $isEdit ? 'Projet modifié avec succès.' : 'Projet créé avec succès.');
 
             // après création, rediriger vers l'édition
-            return $this->redirectToRoute('projet.edit', ['id' => $projet->getId()]);
+            return $this->redirectToRoute('projet.index',);
         }
 
         return $this->render('projet/addMody.html.twig', [
@@ -79,24 +79,6 @@ final class ProjetController extends AbstractController
             'projet' => $projet,
             'action' => $isEdit ? 'Modifier' : 'Nouveau Projet',
         ]);
-    }
-
-    // --- AJAX pour Select2 ---
-    #[Route('/ajax/employes/{projetId?}', name: 'ajax_employe_list')]
-    public function ajaxEmployeList(?int $projetId, EmployeRepository $repo, Request $request): JsonResponse
-    {
-        $term = $request->query->get('q');
-        // Récupérer correctement les IDs à exclure envoyés par Select2
-        $excludeIds = $request->query->all('exclude_ids'); // récupère TOUS les exclude_ids
-        if (!is_array($excludeIds)) {
-            $excludeIds = []; // si aucun exclude_ids envoyé
-        }
-        // Nettoyer les valeurs non numériques
-        $excludeIds = array_filter($excludeIds, fn($id) => is_numeric($id));
-
-        $employes = $repo->AjaxfindEmployesDisponiblesOuAffectes($projetId, $term, $excludeIds);
-
-        return new JsonResponse(['results' => $employes]);
     }
 
 }
