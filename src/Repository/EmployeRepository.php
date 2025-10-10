@@ -1,15 +1,12 @@
 <?php
-
+// src/Repository/EmployeRepository.php
 namespace App\Repository;
 
 use App\Entity\Employe;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
 
-/**
- * @extends ServiceEntityRepository<Employe>
- */
 class EmployeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -18,15 +15,15 @@ class EmployeRepository extends ServiceEntityRepository
     }
 
     /**
-     * Retourne les employés non affectés à d'autres projets
-     * ou déjà liés à un projet donné.
-     * Voici la requete construite par Doctrine :
+     * Retourne un QueryBuilder pour l'utilisation dans le formulaire (EntityType->query_builder).
      *
-     * SELECT e.*, p.*
-     * FROM employe e
-     * LEFT JOIN employe_projet ep ON ep.employe_id = e.id
-     * LEFT JOIN projet p ON p.id = ep.projet_id
-     * WHERE p.id IS NULL OR p.id = :pid
+     * Comportement :
+     *  - si $projetId fourni : on renvoie un QB qui permet d'afficher tous les employés,
+     *    y compris ceux déjà affectés à CE projet (utile pour la pré-sélection),
+     *    mais la logique de filtrage détaillée pour l'AJAX est gérée côté Ajaxfind...
+     *  - si $projetId null : renvoie tous les employés (ordre par nom).
+     *
+     * IMPORTANT : retourne un QueryBuilder (pas un array).
      */
     public function findEmployesDisponiblesOuAffectes(?int $projetId): QueryBuilder
     {
@@ -35,38 +32,58 @@ class EmployeRepository extends ServiceEntityRepository
             ->addSelect('p');
 
         if ($projetId) {
-            $qb->where('p.id IS NULL OR p.id = :pid')
-                ->setParameter('pid', $projetId);
+            // Inclure les employés non liés à d’autres projets
+            // + ceux déjà liés à CE projet
+            $qb->andWhere('p.id IS NULL OR p.id = :projetId')
+                ->setParameter('projetId', $projetId);
         } else {
-            $qb->where('p.id IS NULL');
+            // En mode création : employés non liés à aucun projet
+            $qb->andWhere('p.id IS NULL');
         }
 
-        return $qb;
+        return $qb->orderBy('e.nom', 'ASC');
     }
 
-    // Version SQL optimisée pour AJAX / Select2
-    public function AjaxfindEmployesDisponiblesOuAffectes(?int $projetId): array
+
+    /**
+     * Méthode utilisée par l'endpoint AJAX (Select2).
+     * Implémentée avec QueryBuilder Doctrine mais retourne un array simple
+     * de la forme: [ ['id' => ..., 'text' => 'Nom Prenom'], ... ]
+     *
+     * Comportement : exclut uniquement les employés déjà liés à CE projet
+     * (si $projetId fourni). Les employés liés à d'autres projets restent visibles.
+     */
+    public function AjaxfindEmployesDisponiblesOuAffectes(?int $projetId, ?string $term = null, array $excludeIds = []): array
     {
-        $conn = $this->getEntityManager()->getConnection();
+        $qb = $this->createQueryBuilder('e')
+            ->select('e.id, e.nom, e.prenom');
 
-        $sql = "
-            SELECT e.id, e.nom
-            FROM employe e
-            WHERE e.id NOT IN (
-                SELECT ep.employe_id
-                FROM employe_projet ep
-                WHERE ep.projet_id <> :pid
-            )
-            OR e.id IN (
-                SELECT ep.employe_id
-                FROM employe_projet ep
-                WHERE ep.projet_id = :pid
-            )
-            ORDER BY e.nom ASC
-        ";
+        if ($projetId) {
+            $qb->leftJoin('e.projets', 'p_with_pid', 'WITH', 'p_with_pid.id = :pid')
+                ->setParameter('pid', $projetId);
+        }
 
-        $stmt = $conn->prepare($sql);
-        $stmt->bindValue('pid', $projetId ?? 0);
-        return $stmt->executeQuery()->fetchAllAssociative();
+        if (!empty($term)) {
+            $qb->andWhere('e.nom LIKE :term OR e.prenom LIKE :term')
+                ->setParameter('term', '%' . $term . '%');
+        }
+
+        if (!empty($excludeIds)) {
+            $qb->andWhere('e.id NOT IN (:excludeIds)')
+                ->setParameter('excludeIds', $excludeIds);
+        }
+
+        $qb->orderBy('e.nom', 'ASC')
+            ->setMaxResults(50);
+
+        $rows = $qb->getQuery()->getArrayResult();
+
+        return array_map(static function (array $r) {
+            return [
+                'id' => $r['id'],
+                'text' => trim($r['nom'] . ' ' . ($r['prenom'] ?? '')),
+            ];
+        }, $rows);
     }
+
 }

@@ -29,55 +29,55 @@ final class ProjetController extends AbstractController
         ]);
     }
 
+    // --- Route création ---
     #[Route('/projet/nouveau', name: 'projet.new')]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function add(Request $request, EmployeRepository $employeRepo): Response
     {
-        $projet = new Projet();
+        return $this->addOrEdit(null, $request, $employeRepo);
+    }
+
+    // --- Route édition ---
+    #[Route('/projet/{id}/edit', name: 'projet.edit', requirements: ['id' => '\d+'])]
+    public function edit(int $id, Request $request, EmployeRepository $employeRepo): Response
+    {
+        return $this->addOrEdit($id, $request, $employeRepo);
+    }
+
+    // --- Méthode commune création / édition ---
+    private function addOrEdit(?int $id, Request $request, EmployeRepository $employeRepo): Response
+    {
+        $isEdit = (bool) $id;
+        $projet = $isEdit ? $this->projetRepository->find($id) : new Projet();
+
+        if ($isEdit && !$projet) {
+            throw $this->createNotFoundException('Projet introuvable.');
+        }
+
+        // employés déjà liés pour pré-sélection
+        $employesSelectionnes = $isEdit ? $projet->getEmployes()->toArray() : [];
 
         $form = $this->createForm(ProjectType::class, $projet, [
-            'ajax_url' => $this->generateUrl('ajax_employe_list'),
-            'employes_selectiones' =>  [], // aucun employé pré-sélectionné
+            'projet_id' => $isEdit ? $projet->getId() : null,
+            'ajax_url' => $this->generateUrl('ajax_employe_list', ['projetId' => $isEdit ? $projet->getId() : null]),
+            'employes_selectiones' => $employesSelectionnes,
         ]);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($projet);
-            $em->flush();
-            $this->addFlash('success', 'Projet créé avec succès.');
+            $this->entityManager->persist($projet);
+            $this->entityManager->flush();
+
+            $this->addFlash('success', $isEdit ? 'Projet modifié avec succès.' : 'Projet créé avec succès.');
+
+            // après création, rediriger vers l'édition
             return $this->redirectToRoute('projet.edit', ['id' => $projet->getId()]);
         }
 
         return $this->render('projet/addMody.html.twig', [
-            'formProjet' => $form,
-            'action' => 'Nouveau Projet',
+            'formProjet' => $form->createView(),
             'projet' => $projet,
-        ]);
-    }
-
-    #[Route('/Projet/{id}/edit', name: 'projet.edit',requirements: ['id' => '\d+'])]
-    public function edit(Projet $projet, Request $request, EntityManagerInterface $em): Response
-    {
-        $form = $this->createForm(ProjectType::class, $projet, [
-            'projet_id' => $projet->getId(),
-            'ajax_url' => $this->generateUrl('ajax_employe_list', ['projetId' => $projet->getId()]),
-            'employes_selectiones' => $projet->getEmployes()->toArray(),
-        ]);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->flush();
-            //$this->addFlash('success', 'Projet modifié avec succès.');
-
-            return $this->redirectToRoute('projet.index');
-        }
-
-        return $this->render('projet/addMody.html.twig', [
-            'formProjet' => $form,
-            'projet' => $projet,
-            'action' => 'Modifier',
-
+            'action' => $isEdit ? 'Modifier' : 'Nouveau Projet',
         ]);
     }
 
@@ -86,14 +86,17 @@ final class ProjetController extends AbstractController
     public function ajaxEmployeList(?int $projetId, EmployeRepository $repo, Request $request): JsonResponse
     {
         $term = $request->query->get('q');
-        $employes = $repo->AjaxfindEmployesDisponiblesOuAffectes($projetId);
-
-        if ($term) {
-            $employes = array_filter($employes, static fn($e) => stripos($e['nom'], $term) !== false);
+        // Récupérer correctement les IDs à exclure envoyés par Select2
+        $excludeIds = $request->query->all('exclude_ids'); // récupère TOUS les exclude_ids
+        if (!is_array($excludeIds)) {
+            $excludeIds = []; // si aucun exclude_ids envoyé
         }
+        // Nettoyer les valeurs non numériques
+        $excludeIds = array_filter($excludeIds, fn($id) => is_numeric($id));
 
-        $results = array_map(static fn($e) => ['id' => $e['id'], 'text' => $e['nom']], $employes);
+        $employes = $repo->AjaxfindEmployesDisponiblesOuAffectes($projetId, $term, $excludeIds);
 
-        return new JsonResponse(['results' => array_values($results)]);
+        return new JsonResponse(['results' => $employes]);
     }
+
 }
