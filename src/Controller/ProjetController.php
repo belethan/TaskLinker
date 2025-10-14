@@ -58,7 +58,7 @@ final class ProjetController extends AbstractController
 
         $form = $this->createForm(ProjectType::class, $projet, [
             'projet_id' => $isEdit ? $projet->getId() : null,
-            'ajax_url' => $this->generateUrl('ajax_employe_list', ['projetId' => $isEdit ? $projet->getId() : null]),
+            'ajax_url' => $this->generateUrl('api_employes_disponibles', ['projetId' => $isEdit ? $projet->getId() : null]),
             'employes_selectiones' => $employesSelectionnes,
         ]);
 

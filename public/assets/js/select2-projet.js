@@ -5,7 +5,7 @@ $(document).ready(function() {
         const $select = $(this);
         const ajaxUrl = $select.data('ajax-url');
         const projetId = $select.data('projet-id');
-        //const selectedIds = $select.val() || [];
+        //const selectedIds = ($select.data('selected') || '').split(',').filter(Boolean);
 
         // Récupère les IDs déjà sélectionnés pour éviter doublons dans l'AJAX
         let selectedIds = [];
