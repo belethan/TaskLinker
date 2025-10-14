@@ -44,7 +44,8 @@ $(document).ready(function() {
                     return {
                         results: data.results || []
                     };
-                }
+                },
+
             },
         });
 

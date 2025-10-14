@@ -14,39 +14,8 @@ class EmployeRepository extends ServiceEntityRepository
         parent::__construct($registry, Employe::class);
     }
 
-    public function findEmployesDisponiblesOuAffectes(?int $projetId, ?string $term = null, array $excludeIds = []): QueryBuilder
-    {
-        $qb = $this->createQueryBuilder('e')
-            ->leftJoin('e.projets', 'p')
-            ->addSelect('p');
 
-        if ($projetId) {
-            // En édition : inclure les employés libres ou déjà liés à ce projet
-            $qb->andWhere('p.id IS NULL OR p.id = :projetId')
-                ->setParameter('projetId', $projetId);
-        } else {
-            // En création : uniquement les employés non liés
-            $qb->andWhere('p.id IS NULL');
-        }
-
-        // Exclure des employés déjà sélectionnés côté client
-        if (!empty($excludeIds)) {
-            $qb->andWhere('e.id NOT IN (:excludeIds)')
-                ->setParameter('excludeIds', $excludeIds);
-        }
-
-        // Filtrer par recherche textuelle
-        if (!empty($term)) {
-            $qb->andWhere('e.nom LIKE :term OR e.prenom LIKE :term')
-                ->setParameter('term', '%' . $term . '%');
-        }
-
-        return $qb->orderBy('e.nom', 'ASC');
-    }
-
-    // src/Repository/EmployeRepository.php
-
-    public function findEmployesDisponiblesOuAffectesNative(int $projetId, array $idsAExclure = []): QueryBuilder
+    public function findEmployesDisponiblesOuAffectesNative(?int $projetId, array $idsAExclure = []): QueryBuilder
     {
         $conn = $this->getEntityManager()->getConnection();
 
@@ -58,6 +27,12 @@ class EmployeRepository extends ServiceEntityRepository
                  LEFT JOIN projet p1_ ON p1_.id = e2_.projet_id
         WHERE (p1_.id IS NULL OR p1_.id = :projetId)
     ';
+
+
+        // Si $projetId est défini, on ajoute la condition
+        if ($projetId !== null) {
+            $sql .= ' AND (p1_.id IS NULL OR p1_.id = :projetId)';
+        }
 
         if (!empty($idsAExclure)) {
             $sql .= ' AND e0_.id NOT IN (:idsAExclure)';
