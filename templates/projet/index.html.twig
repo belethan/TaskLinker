@@ -12,7 +12,13 @@
                     </a>
                     <div class="card-project-icons">
                         <a href="{{ path('projet.edit',{id : projet.id}) }}"><i class="fa-solid fa-pen"></i></a>
-                        <a href="#"><i class="fa-solid fa-trash"></i></a>
+                        <a href="#" class="text-danger"
+                           data-bs-toggle="modal"
+                           data-bs-target="#confirmArchiveModal"
+                           data-projet-nom="{{ projet.nom }}"
+                           data-confirm-url="{{ path('projet.archiver', {'id': projet.id}) }}">
+                           <i class="fa-solid fa-box-archive"></i>
+                        </a>
                     </div>
             </article>
         {% endfor %}

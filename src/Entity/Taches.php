@@ -23,7 +23,7 @@ class Taches
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $deadline = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'taches')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Employe $employe = null;
 

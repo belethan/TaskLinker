@@ -22,7 +22,7 @@ final class ProjetController extends AbstractController
     #[Route('/', name: 'projet.index')]
     public function index(): Response
     {
-        $projets = $this->projetRepository->findAll();
+        $projets = $this->projetRepository->findNonArchives();
         return $this->render('projet/index.html.twig', [
             'projets' => $projets,
         ]);
@@ -40,6 +40,16 @@ final class ProjetController extends AbstractController
     public function edit(int $id, Request $request, EmployeRepository $employeRepo): Response
     {
         return $this->addOrEdit($id, $request, $employeRepo);
+    }
+
+    #[Route('/projet/{id}/archiver', name: 'projet.archiver')]
+    public function archiver(Request $request, Projet $projet, EntityManagerInterface $em): Response
+    {
+        $projet->setArchiver(true); // ou 1 si c’est un entier
+        $em->flush();
+
+        $this->addFlash('success', 'Le projet a été archivé avec succès.');
+        return $this->redirectToRoute('projet.index');
     }
 
     // --- Méthode commune création / édition ---

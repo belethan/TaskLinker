@@ -16,28 +16,20 @@ class ProjetRepository extends ServiceEntityRepository
         parent::__construct($registry, Projet::class);
     }
 
-    //    /**
-    //     * @return Projet[] Returns an array of Projet objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Liste les projets non archivés.
+     * @return array
+     */
+    public function findNonArchives(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.archiver = 0')
+            ->getQuery()
+            ->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Projet
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+
+
+
+
 }

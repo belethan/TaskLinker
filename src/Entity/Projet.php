@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ProjetRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 
@@ -38,6 +39,9 @@ class Projet
      */
     #[ORM\OneToMany(targetEntity: Taches::class, mappedBy: 'projet')]
     private Collection $taches;
+
+    #[ORM\Column(type: Types::SMALLINT)]
+    private ?int $archiver = 0;
 
     public function __construct()
     {
@@ -140,6 +144,18 @@ class Projet
                 $tach->setProjet(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getArchiver(): ?int
+    {
+        return $this->archiver;
+    }
+
+    public function setArchiver(int $archiver): static
+    {
+        $this->archiver = $archiver;
 
         return $this;
     }
