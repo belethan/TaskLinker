@@ -1,6 +1,5 @@
 // public/js/select2-projet.js
 $(document).ready(function() {
-    console.log("Select2 avant chargement ✅");
     $('select.select2-ajax').each(function() {
         const $select = $(this);
         const ajaxUrl = $select.data('ajax-url');
@@ -60,9 +59,15 @@ $(document).ready(function() {
             $(this).trigger('change.select2');
         });
     });
-    console.log("Typemodal.js chargé ✅");
     // code pour la appel à une modale
     $.getScript("/assets/js/typemodal.js");
-    console.log("Modal détectée ?", $modal.length);
+    // --- AJOUT : fermeture automatique des alertes Bootstrap ---
+    $('.alert').each(function() {
+        const alertElement = $(this);
+        // auto-fermeture après 3 secondes
+        setTimeout(function() {
+            alertElement.alert('close'); // utilise Bootstrap via jQuery
+        }, 3000);
+    });
 
 });

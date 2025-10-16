@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\statutTache;
 use App\Repository\TachesRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -30,6 +31,10 @@ class Taches
     #[ORM\ManyToOne(inversedBy: 'taches')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Projet $projet = null;
+
+    #[ORM\Column(enumType: statutTache::class)]
+    private ?statutTache $statutTache = null;
+
 
     public function getId(): ?int
     {
@@ -93,6 +98,16 @@ class Taches
     {
         $this->projet = $projet;
 
+        return $this;
+    }
+    public function getstatutTache(): ?statutTache
+    {
+        return $this->statutTache;
+    }
+
+    public function setstatutTache(?statutTache $typeTache): static
+    {
+        $this->statutTache = $typeTache;
         return $this;
     }
 }

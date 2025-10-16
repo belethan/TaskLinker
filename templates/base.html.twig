@@ -53,9 +53,14 @@
                     <div id="current-user"></div>
                     <div id="title-page">
                         <h1>{% block Nompage %} {% endblock %}</h1>
+                        {% block listemploye %}
+
+                        {% endblock %}
                     </div>
                 </header>
+                {# Bloc de contenu principal #}
                  <div id="content">
+                     {%  include 'commun/flash.html.twig' %}
                      {% block body %}
 
                      {% endblock %}

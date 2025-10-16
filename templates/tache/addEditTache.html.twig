@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tâche{% endblock %}
+
+{% block Nompage %}
+    <strong>
+        {{ isEdition ? 'Modifier la tâche : ' ~ tache.titre : 'Créer une nouvelle tâche' }}
+    </strong>
+{% endblock %}
+
+{% block body %}
+    {{ form_start(form) }}
+
+    {{ form_row(form.titre) }}
+    {{ form_row(form.description) }}
+
+{#    <div class="form-flex">#}
+     {{ form_row(form.deadline) }}
+     {{ form_row(form.statutTache) }}
+{#    </div>#}
+
+    {{ form_row(form.employe) }}
+
+    <div class="mt-3">
+        <button type="submit" class="btn btn-primary">
+            {{ isEdition ? 'Enregistrer les modifications' : 'Enregistrer la tâche' }}
+        </button>
+    </div>
+
+    {{ form_end(form) }}
+{% endblock %}
