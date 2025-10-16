@@ -46,6 +46,24 @@ final class EmployeController extends AbstractController
         ]);
     }
 
+    #[Route('/employe/{id}/supprimer', name: 'employe.delete')]
+    public function delete(Employe $employe, EntityManagerInterface $em, Request $request): Response
+    {
+        // Vérifie si l'employé est associé à au moins un projet
+        if (!$employe->getProjets()->isEmpty()) {
+            $this->addFlash('danger', 'Vous ne pouvez pas supprimer cet employé car il est associé à au moins un projet.');
+            return $this->redirectToRoute('employe');
+        }
+
+        // Suppression de l'employé
+        $em->remove($employe);
+        $em->flush();
+
+        $this->addFlash('success', 'L\'employé a bien été supprimé.');
+        return $this->redirectToRoute('employe');
+    }
+
+
     #[Route('/api/employes/disponibles', name: 'api_employes_disponibles', methods: ['GET'])]
     public function ajaxDispo(Request $request, EmployeRepository $employeRepo): JsonResponse
     {

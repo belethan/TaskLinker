@@ -12,12 +12,18 @@
                     </a>
                     <div class="card-project-icons">
                         <a href="{{ path('projet.edit',{id : projet.id}) }}"><i class="fa-solid fa-pen"></i></a>
-                        <a href="#" class="text-danger"
+                        <!-- Bouton archivage / suppression -->
+                        <a href="#"
+                           class="text-danger"
                            data-bs-toggle="modal"
-                           data-bs-target="#confirmArchiveModal"
-                           data-projet-nom="{{ projet.nom }}"
-                           data-confirm-url="{{ path('projet.archiver', {'id': projet.id}) }}">
-                           <i class="fa-solid fa-box-archive"></i>
+                           data-bs-target="#genericConfirmModal"
+
+                            {# 🔹 Variables passées à la modale #}
+                           data-modal-title="Confirmer l'archivage"
+                           data-modal-body='Voulez-vous vraiment archiver le projet <strong>{{ projet.nom }}</strong> ?<br><p class="text-center mt-2"><strong>Ce projet ne sera plus accessible.</strong></p>'
+                           data-confirm-url="{{ path('projet.archiver', {'id': projet.id}) }}"
+                           data-confirm-color="btn-warning">
+                            <i class="fa-solid fa-box-archive"></i>
                         </a>
                     </div>
             </article>

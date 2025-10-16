@@ -52,6 +52,7 @@ final class ProjetController extends AbstractController
         return $this->redirectToRoute('projet.index');
     }
 
+
     // --- Méthode commune création / édition ---
     private function addOrEdit(?int $id, Request $request, EmployeRepository $employeRepo): Response
     {

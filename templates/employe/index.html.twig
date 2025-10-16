@@ -31,9 +31,17 @@
                             <a class="button button-edit-team" href="{{ path('employe_edit', {id: employe.id}) }}">
                                 Éditer
                             </a>
-                            <a class="delete-team" href="#">
+                            <a href="#"
+                               class="delete-team text-danger"
+                               data-bs-toggle="modal"
+                               data-bs-target="#genericConfirmModal"
+                               data-modal-title="Suppression d’un employé"
+                               data-modal-body="Voulez-vous vraiment supprimer <strong>{{ employe.prenom ~ ' ' ~ employe.nom }}</strong> ?"
+                               data-confirm-url="{{ path('employe.delete', {id: employe.id}) }}"
+                               data-confirm-color="btn-danger">
                                 Supprimer
                             </a>
+
                         </td>
                     </tr>
                 {% endfor %}

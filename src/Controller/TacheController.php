@@ -96,6 +96,24 @@ final class TacheController extends AbstractController
     }
 
     // ============================================================
+    // =============== SUPPRIMER UNE TÂCHE =========================
+    // ============================================================
+    #[Route('/tache/{id}/supprimer', name: 'tache.delete')]
+    public function delete(Taches $tache, EntityManagerInterface $em): Response
+    {
+        $projet = $tache->getProjet();
+
+        $em->remove($tache);
+        $em->flush();
+
+        $this->addFlash('success', 'La tâche a bien été supprimée.');
+
+        // Redirection vers la liste des tâches du projet
+        return $this->redirectToRoute('tache.index', ['id' => $projet->getId()]);
+    }
+
+
+    // ============================================================
     // =============== MÉTHODES PRIVÉES ===========================
     // ============================================================
 

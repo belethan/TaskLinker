@@ -69,24 +69,25 @@
         </div>
         {# Bloc modal global réutilisable #}
         {% block modal %}
-            <div class="modal fade" id="confirmArchiveModal" tabindex="-1" aria-labelledby="confirmArchiveLabel" aria-hidden="true">
+            <div class="modal fade" id="genericConfirmModal" tabindex="-1" aria-labelledby="genericConfirmLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
-                        <div class="modal-header bg-warning-subtle">
-                            <h5 class="modal-title" id="confirmArchiveLabel">Confirmer l'archivage</h5>
+                        <div class="modal-header bg-light">
+                            <h5 class="modal-title" id="genericConfirmLabel">Titre par défaut</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
                         <div class="modal-body">
-                            <p></p>
+                            <p>Contenu du message par défaut.</p>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <a href="#" class="btn btn-warning" id="confirmArchiveBtn">Archiver</a>
+                            <a href="#" id="confirmActionBtn" class="btn btn-danger">Confirmer</a>
                         </div>
                     </div>
                 </div>
             </div>
         {% endblock %}
+
         {# jQuery + Select2 JS #}
 
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>

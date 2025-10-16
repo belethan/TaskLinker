@@ -27,5 +27,21 @@
         </button>
     </div>
 
+    {# 🔹 Lien de suppression affiché uniquement en mode édition #}
+    {% if isEdition %}
+        <div class="mt-3">
+            <a href="#"
+               class="text-danger d-inline-block"
+               data-bs-toggle="modal"
+               data-bs-target="#genericConfirmModal"
+               data-modal-title="Confirmer la suppression"
+               data-modal-body='Voulez-vous vraiment supprimer la tâche <strong>{{ tache.titre }}</strong> ?<br><p class="text-center mt-2"><strong>Cette action est irréversible.</strong></p>'
+               data-confirm-url="{{ path('tache.delete', {'id': tache.id}) }}"
+               data-confirm-color="btn-danger">
+                <i class="fa-solid fa-trash"></i> Supprimer la tâche
+            </a>
+        </div>
+    {% endif %}
+
     {{ form_end(form) }}
 {% endblock %}

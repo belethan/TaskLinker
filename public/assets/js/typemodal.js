@@ -1,28 +1,22 @@
-$(document).ready(function() {
-
-    // Sélection de la modale
-    const $modal = $('#confirmArchiveModal');
+$(document).ready(function () {
+    const $modal = $('#genericConfirmModal');
     const $modalTitle = $modal.find('.modal-title');
-    const $modalBody = $modal.find('.modal-body p');
-    const $confirmBtn = $modal.find('#confirmArchiveBtn');
+    const $modalBody = $modal.find('.modal-body');
+    const $confirmBtn = $modal.find('#confirmActionBtn');
 
-    // Quand la modale s'ouvre
-    $modal.on('show.bs.modal', function(event) {
-        const button = $(event.relatedTarget); // bouton cliqué
-        const projetNom = button.data('projet-nom');
-        const confirmUrl = button.data('confirm-url');
+    $modal.on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
 
-        // Mise à jour du titre
-        $modalTitle.text("Confirmer l'archivage");
+        const title = button.data('modal-title') || 'Confirmation';
+        const body = button.data('modal-body') || 'Voulez-vous vraiment effectuer cette action ?';
+        const confirmUrl = button.data('confirm-url') || '#';
+        const confirmColor = button.data('confirm-color') || 'btn-danger';
 
-        // Mise à jour du message
-        $modalBody.html(
-            'Voulez-vous vraiment archiver le projet "' + projetNom + '" ?' +
-            '<p style="text-align:center; margin-top:8px;"><strong>Ce projet ne sera plus accessible.</strong></p>'
-        );
-
-
-        // Mise à jour du lien de confirmation
+        $modalTitle.text(title);
+        $modalBody.html(body);
         $confirmBtn.attr('href', confirmUrl);
+
+        // Appliquer la bonne couleur
+        $confirmBtn.removeClass('btn-danger btn-warning btn-primary').addClass(confirmColor);
     });
 });
