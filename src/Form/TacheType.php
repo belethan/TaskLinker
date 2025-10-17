@@ -30,6 +30,9 @@ class TacheType extends AbstractType
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
                 'required' => false,
+                'attr' => [
+                    'rows' => 5
+                ],
             ])
             ->add('deadline', DateType::class, [
                 'label' => 'Date limite',
