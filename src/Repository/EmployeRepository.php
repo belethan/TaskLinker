@@ -6,14 +6,29 @@ use App\Entity\Employe;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
-class EmployeRepository extends ServiceEntityRepository
+class EmployeRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Employe::class);
     }
 
+    /**
+     * Permet de mettre à jour le mot de passe (quand un utilisateur se reconnecte avec un hash plus récent)
+     */
+    public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
+    {
+        if (!$user instanceof Employe) {
+            throw new \InvalidArgumentException('Instances attendue de Employe');
+        }
+
+        $user->setPassword($newHashedPassword);
+        $this->getEntityManager()->persist($user);
+        $this->getEntityManager()->flush();
+    }
 
     public function findEmployesDisponiblesOuAffectesNative(?int $projetId, array $idsAExclure = []): QueryBuilder
     {

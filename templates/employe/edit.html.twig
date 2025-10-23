@@ -10,6 +10,14 @@
     {{ form_row(formEmploye.prenom) }}
     {{ form_row(formEmploye.email) }}
 
+    {# Champ mot de passe - uniquement si défini dans le formType #}
+    {{ form_row(formEmploye.password,
+        {
+            label: 'Mot de passe',
+            attr: { placeholder: 'Laisser vide pour ne pas changer' }
+        })
+    }}
+
     <div class="form-flex">
         {{ form_row(formEmploye.dateEntree) }}
         {{ form_row(formEmploye.typeContrat) }}

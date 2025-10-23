@@ -31,6 +31,7 @@
     </head>
     <body>
         <div id="main-container">
+            {% block navigation %}
             <nav>
                 <a href="{{ path("projet.index") }}" id="logo">
                     <img src="{{ asset('assets/images/logo.png') }}" alt="Logo TaskLinker" />"
@@ -48,6 +49,7 @@
                     </li>
                 </ul>
             </nav>
+            {% endblock %}
             <main>
                 <header>
                     <div id="current-user"></div>

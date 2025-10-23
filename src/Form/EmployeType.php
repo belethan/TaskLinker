@@ -76,6 +76,15 @@ class EmployeType extends AbstractType
                     ])
                 ]
             ])
+            ->add('password', PasswordType::class, [
+                'required' => false, // ⚠️ pour ne pas forcer la saisie
+                'mapped' => false,   // car on va l’encoder manuellement dans le contrôleur
+                'label' => 'Mot de passe',
+                'attr' => [
+                    'autocomplete' => 'new-password',
+                    'placeholder' => 'Laisser vide pour conserver l’ancien mot de passe'
+                ],
+            ])
             ->add('dateEntree', DateTimeType::class, [
                 'label' => 'Date d\'entrée',
                 'required' => true,

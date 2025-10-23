@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+ {% block stylesheets %}
+     <link rel="stylesheet" href="{{ asset('assets/styles/loginstyle.css') }}">
+ {% endblock %}
+{% block body %}
+    {% block navigation %}{# pas de nav ici #}{% endblock %}
+    <div class="logo">TaskLinker</div>
+
+    <div class="login-container welcome-container">
+        <h1>Bienvenue sur TaskLinker</h1>
+        <p class="subtitle">Commencez dès maintenant - gratuitement</p>
+
+        <div class="welcome-buttons">
+            <p>Vous avez déjà un compte ?</p>
+            <a href="{{ path('projet.index') }}"><button class="btn btn-primary">Se connecter</button></a>
+
+            <div class="divider">ou</div>
+
+            <a href="{{ path('projet.index') }}"><button class="btn btn-secondary">S’inscrire</button></a>
+        </div>
+    </div>
+{% endblock %}

@@ -19,7 +19,7 @@ final class ProjetController extends AbstractController
         private EntityManagerInterface $entityManager,
     ){}
 
-    #[Route('/', name: 'projet.index')]
+    #[Route('/projet', name: 'projet.index')]
     public function index(): Response
     {
         $projets = $this->projetRepository->findNonArchives();

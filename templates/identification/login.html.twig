@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+ {% block stylesheets %}
+     <link rel="stylesheet" href="{{ asset('assets/styles/loginstyle.css') }}">
+ {% endblock %}
+{% block body %}
+    {% block navigation %}{# pas de nav ici #}{% endblock %}
+    <div class="logo">TaskLinker</div>
+
+    <div class="login-container">
+        <h1>Se connecter</h1>
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+        <form action="{{ path('login') }}" method="post">
+            <label for="email">E-mail</label>
+            <input type="email" value="{{ last_username }}" id="email" name="email"  required autofocus>
+
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" required>
+
+            {# ✅ champ CSRF obligatoire #}
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+            <button type="submit">Continuer</button>
+
+            <div class="register-link">
+                Pas de compte ? <a href="#">S’inscrire</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+

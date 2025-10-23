@@ -11,6 +11,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
 
 final class EmployeController extends AbstractController
 {
@@ -28,7 +30,11 @@ final class EmployeController extends AbstractController
     }
 
     #[Route('/employe/{id}/editer', name:'employe_edit')]
-    public function edit(Employe $employes,Request $request, EntityManagerInterface $em): Response
+    public function edit(Employe $employes,
+                         Request $request,
+                         EntityManagerInterface $em,
+                         UserPasswordHasherInterface $passwordHasher
+    ): Response
     {
         // création du formulaire
         $formEmploye = $this->createForm(EmployeType::class, $employes);
@@ -36,6 +42,12 @@ final class EmployeController extends AbstractController
         $formEmploye->handleRequest($request);
         // bloc de validation
         if ($formEmploye->isSubmitted() && $formEmploye->isValid()) {
+            $plainPassword = $formEmploye->get('password')->getData();
+            // ⚙️ Si un nouveau mot de passe a été saisi, on l’encode et on le remplace
+            if ($plainPassword) {
+                $hashedPassword = $passwordHasher->hashPassword($employes, $plainPassword);
+                $employes->setPassword($hashedPassword);
+            }
             $em->persist($employes);
             $em->flush();
             return $this->redirectToRoute('employe');

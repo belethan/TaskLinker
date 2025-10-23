@@ -1,17 +1,44 @@
 security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    #password_hashers:
+        #Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+    # Hachage sécurisé des mots de passe
     password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        App\Entity\Employe:
+            algorithm: auto
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
+        app_user_provider:
+            entity:
+                class: App\Entity\Employe
+                property: email
+
+    role_hierarchy:
+        ROLE_ADMIN: [ ROLE_SUPERVISEUR, ROLE_EMPLOYE, PUBLIC_ACCESS]
+        ROLE_SUPERVISEUR: [ ROLE_EMPLOYE]
+        ROLE_EMPLOYE:     [PUBLIC_ACCESS]
+        ROLE_PUBLIC:      []
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             lazy: true
-            provider: users_in_memory
+            provider: app_user_provider
+            form_login:
+                login_path: login
+                check_path: login
+                username_parameter: email       # ✅ obligatoire
+                password_parameter: password    # ✅ obligatoire
+                default_target_path: projet.index
+                enable_csrf: true
+                csrf_token_id: authenticate # ✅ doit correspondre à ton formulaire
+            logout:
+                path: logout
+                target: welcome
+                # where to redirect after logout
+                # target: app_any_route
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -21,9 +48,17 @@ security:
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
+    # Contrôle d’accès (ordre prioritaire)
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/$, roles: PUBLIC_ACCESS }
+
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/superviseur, roles: ROLE_SUPERVISEUR }
+        - { path: ^/projet, roles: ROLE_EMPLOYE }
+
+        - { path: ^/, roles: ROLE_EMPLOYE }
 
 when@test:
     security:
