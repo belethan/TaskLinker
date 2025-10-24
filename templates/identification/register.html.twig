@@ -10,27 +10,16 @@
 
     <div class="login-container">
         <h1>S’inscrire</h1>
-        <form class="registerForm">
-            <label for="nom">Nom</label>
-            <input type="text" id="nom" name="nom" required>
-
-            <label for="prenom">Prénom</label>
-            <input type="text" id="prenom" name="prenom" required>
-
-            <label for="email">E-mail</label>
-            <input type="email" id="email" name="email" required>
-
-            <label for="password">Mot de passe</label>
-            <input type="password" id="password" name="password" required>
-
-            <label for="confirm-password">Confirmation mot de passe</label>
-            <input type="password" id="confirm-password" name="confirm-password" required>
-
+        {{ form_start(form) }}
+            {{ form_row(form.nom) }}
+            {{ form_row(form.prenom) }}
+            {{ form_row(form.email) }}
+            {{ form_row(form.password) }}
+            {{ form_row(form.confirmPassword) }}
             <button type="submit">Continuer</button>
-
-            <div class="register-link">
-                Vous avez déjà un compte ? <a href="login.html">Se connecter</a>
-            </div>
-        </form>
+        {{ form_end(form) }}
+        <div class="register-link">
+            Vous avez déjà un compte ? <a href="{{ path('login') }}">Se connecter</a>
+        </div>
     </div>
 {% endblock %}

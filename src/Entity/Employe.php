@@ -44,10 +44,10 @@ class Employe implements UserInterface, PasswordAuthenticatedUserInterface
     private ?typeContrat $typeContrat = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?\DateTimeImmutable $createdAt ;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updatedAt = null;
+    private ?\DateTimeImmutable $updatedAt ;
 
     /**
      * @var Collection<int, Projet>
@@ -62,6 +62,7 @@ class Employe implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'employe', targetEntity: Taches::class, cascade: ['persist', 'remove'])]
     private Collection $taches;
 
+
     /**
      * Déclaration des Getter et Setter
      */
@@ -70,6 +71,9 @@ class Employe implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->projets = new ArrayCollection();
         $this->taches = new ArrayCollection();
+        $this->date_entree = new \DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->typeContrat =typeContrat::CDI;
     }
     public function getId(): ?int
     {

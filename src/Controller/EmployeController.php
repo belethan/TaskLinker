@@ -36,6 +36,15 @@ final class EmployeController extends AbstractController
                          UserPasswordHasherInterface $passwordHasher
     ): Response
     {
+        // 🔒 Récupération de l'utilisateur connecté
+        $user = $this->getUser();
+
+        // ⚠️ Vérification : seul le propriétaire de la fiche peut la modifier
+        if ($user->getId() !== $employes->getId()) {
+            $this->addFlash('danger', 'Vous ne pouvez pas modifier le profil d’un autre employé.');
+            return $this->redirectToRoute('employe'); // redirection vers la liste
+        }
+
         // création du formulaire
         $formEmploye = $this->createForm(EmployeType::class, $employes);
         // traitement du formulaire pour mettre à jour les champs dans le cas ou redirige vers le formulaire

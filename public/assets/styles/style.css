@@ -42,6 +42,23 @@ main {
     margin-bottom: 70px;
 }
 
+#current-user .logout-link {
+    color: white !important;
+    border-color: white !important;
+}
+/* ---- Zone utilisateur ---- */
+#current-user {
+    justify-content: flex-end; /* aligner à droite */
+}
+
+/* Nom et prénom de l'utilisateur */
+#current-user .user-name {
+    color: white;
+    font-size: 22px;
+    font-weight: 500;
+}
+
+
 ul#main-menu {
     margin: 0;
     list-style: none;

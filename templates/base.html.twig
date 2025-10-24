@@ -52,7 +52,18 @@
             {% endblock %}
             <main>
                 <header>
-                    <div id="current-user"></div>
+                    <div id="current-user" class="d-flex align-items-center justify-content-end">
+                        {% if app.user %}
+                            <span class="me-3 user-name">
+                                <i class="fa-regular fa-user"></i>
+                                {{ app.user.prenom }} {{ app.user.nom }}
+                            </span>
+                            <a href="{{ path('logout') }}" class="btn btn-outline-danger btn-sm logout-link">
+                                <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
+                            </a>
+                        {% endif %}
+                    </div>
+
                     <div id="title-page">
                         <h1>{% block Nompage %} {% endblock %}</h1>
                         {% block listemploye %}
