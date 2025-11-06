@@ -14,10 +14,10 @@ security:
                 property: email
 
     role_hierarchy:
-        ROLE_ADMIN: [ ROLE_SUPERVISEUR, ROLE_EMPLOYE, PUBLIC_ACCESS]
+        ROLE_ADMIN: [ ROLE_SUPERVISEUR, ROLE_EMPLOYE]
         ROLE_SUPERVISEUR: [ ROLE_EMPLOYE]
-        ROLE_EMPLOYE:     [PUBLIC_ACCESS]
-        ROLE_PUBLIC:      []
+       #ROLE_EMPLOYE:     [PUBLIC_ACCESS]
+       # ROLE_PUBLIC:      []
 
     firewalls:
         dev:

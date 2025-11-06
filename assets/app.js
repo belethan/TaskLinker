@@ -4,5 +4,8 @@
  * This file will be included onto the page via the importmap() Twig function,
  * which should already be in your base.html.twig.
  */
+import './styles/app.css'
+import 'js/select2-projet.js'
+import 'js/typemodal.js'
 import './bootstrap.js';
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');

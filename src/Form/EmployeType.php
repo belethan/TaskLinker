@@ -6,6 +6,8 @@ use App\Entity\Employe;
 use App\Enum\TypeContrat;
 use Symfony\Component\Form\AbstractType;
 
+use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -117,12 +119,37 @@ class EmployeType extends AbstractType
                     ])
                 ]
             ])
+            ->add('roles', ChoiceType::class, [
+                'label' => 'Rôles',
+                'choices' => [
+                    'Employé' => 'ROLE_EMPLOYE',
+                    'Administrateur' => 'ROLE_ADMIN',
+                ],
+                'placeholder' => false,  // pas de placeholder, pour forcer la sélection
+                'required' => true,
+                'multiple' => false,   // visuellement un seul choix possible
+                'expanded' => false,   // <select>
+                'attr' => ['class' => 'form-select'],
+            ])
+
             ->add('submit', SubmitType::class, [
                 'label' => 'Enregistrer',
                 'attr' => [
                     'class' => 'button button-submit'
                 ]
-            ]);
+            ])
+            ->addModelTransformer(new CallbackTransformer(
+            // Transforme l'array (en base) -> string (pour affichage dans le form)
+                function ($rolesArray) {
+                    // Ex. ['ROLE_ADMIN'] devient 'ROLE_ADMIN'
+                    return is_array($rolesArray) && count($rolesArray) ? $rolesArray[0] : null;
+                },
+                // Transforme le string (du formulaire) -> array (pour sauvegarde)
+                function ($rolesString) {
+                    // Ex. 'ROLE_ADMIN' devient ['ROLE_ADMIN']
+                    return $rolesString ? [$rolesString] : [];
+                }
+            ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void

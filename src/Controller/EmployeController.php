@@ -30,7 +30,7 @@ final class EmployeController extends AbstractController
     }
 
     #[Route('/employe/{id}/editer', name:'employe_edit')]
-    public function edit(Employe $employes,
+    public function edit(Employe $employe,
                          Request $request,
                          EntityManagerInterface $em,
                          UserPasswordHasherInterface $passwordHasher
@@ -46,7 +46,7 @@ final class EmployeController extends AbstractController
         }
 
         // création du formulaire
-        $formEmploye = $this->createForm(EmployeType::class, $employes);
+        $formEmploye = $this->createForm(EmployeType::class, $employe);
         // traitement du formulaire pour mettre à jour les champs dans le cas ou redirige vers le formulaire
         $formEmploye->handleRequest($request);
         // bloc de validation
@@ -54,15 +54,15 @@ final class EmployeController extends AbstractController
             $plainPassword = $formEmploye->get('password')->getData();
             // ⚙️ Si un nouveau mot de passe a été saisi, on l’encode et on le remplace
             if ($plainPassword) {
-                $hashedPassword = $passwordHasher->hashPassword($employes, $plainPassword);
-                $employes->setPassword($hashedPassword);
+                $hashedPassword = $passwordHasher->hashPassword($employe, $plainPassword);
+                $employe->setPassword($hashedPassword);
             }
-            $em->persist($employes);
+            $em->persist($employe);
             $em->flush();
             return $this->redirectToRoute('employe');
         }
         return $this->render('employe/edit.html.twig', [
-            'employe' => $employes,
+            'employe' => $employe,
             'formEmploye' => $formEmploye,
         ]);
     }

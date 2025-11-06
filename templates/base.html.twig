@@ -17,13 +17,11 @@
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         {# --- CSS du projet --- #}
         {% block stylesheets %}
-            <link rel="stylesheet" href="{{ asset('assets/styles/style.css') }}">
+            {% if app.request.attributes.get('_route') not in ['login', 'welcome', 'register'] %}
+                <link rel="stylesheet" href="{{ asset('/styles/style.css') }}">
+            {% endif %}
         {% endblock %}
 
-        {# --- Scripts personnalisés (ImportMap) --- #}
-{#        {% block importmap %}#}
-{#            {{ importmap('app') }}#}
-{#        {% endblock %}#}
 
         {% block javascripts %}
             {# Optionnel : scripts spécifiques supplémentaires ici #}
@@ -34,7 +32,7 @@
             {% block navigation %}
             <nav>
                 <a href="{{ path("projet.index") }}" id="logo">
-                    <img src="{{ asset('assets/images/logo.png') }}" alt="Logo TaskLinker" />"
+                    <img src="{{ asset('/images/logo.png') }}" alt="Logo TaskLinker" />"
                 </a>
                 <ul id="main-menu">
                     <li class="{{ app.current_route starts with 'projet' ? 'active': '' }}">
@@ -106,6 +104,6 @@
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
         {# Ton JS perso, chargé après jQuery + Select2 #}
-        <script src="{{ asset('assets/js/select2-projet.js') }}"></script>
+        <script src="{{ asset('/js/select2-projet.js') }}"></script>
     </body>
 </html>
