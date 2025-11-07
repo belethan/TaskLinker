@@ -125,11 +125,16 @@ class EmployeType extends AbstractType
                     'Employé' => 'ROLE_EMPLOYE',
                     'Administrateur' => 'ROLE_ADMIN',
                 ],
-                'placeholder' => false,  // pas de placeholder, pour forcer la sélection
+                'placeholder' =>'Sélectionnez un rôle',  // pas de placeholder, pour forcer la sélection
                 'required' => true,
                 'multiple' => false,   // visuellement un seul choix possible
                 'expanded' => false,   // <select>
-                'attr' => ['class' => 'form-select'],
+                'choice_value' => fn ($value) => $value,
+                'attr' => [
+                    'class' => 'form-select select2-role',
+                    'data-placeholder' => 'Choisir un rôle...',
+                    'style' => 'width:100%;',
+                ],
             ])
 
             ->add('submit', SubmitType::class, [
@@ -137,25 +142,26 @@ class EmployeType extends AbstractType
                 'attr' => [
                     'class' => 'button button-submit'
                 ]
-            ])
-            ->addModelTransformer(new CallbackTransformer(
-            // Transforme l'array (en base) -> string (pour affichage dans le form)
-                function ($rolesArray) {
-                    // Ex. ['ROLE_ADMIN'] devient 'ROLE_ADMIN'
-                    return is_array($rolesArray) && count($rolesArray) ? $rolesArray[0] : null;
-                },
-                // Transforme le string (du formulaire) -> array (pour sauvegarde)
-                function ($rolesString) {
-                    // Ex. 'ROLE_ADMIN' devient ['ROLE_ADMIN']
-                    return $rolesString ? [$rolesString] : [];
-                }
-            ));
+            ]);
+        // DataTransformer : array <=> string
+        $builder->get('roles')->addModelTransformer(new CallbackTransformer(
+            function ($rolesArray) {
+                // Transforme le tableau en valeur unique pour l'affichage
+                return count($rolesArray) ? $rolesArray[0] : null;
+            },
+            function ($rolesString) {
+                // Re-transforme la valeur string en tableau pour Doctrine
+                return $rolesString ? [$rolesString] : [];
+            }
+        ));
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Employe::class,
+            'translation_domain' => false,
         ]);
     }
 }

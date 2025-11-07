@@ -34,6 +34,7 @@ class Employe implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'json')]
     private array $roles = [];
 
+
     #[ORM\Column]
     private ?string $password = null;
 
@@ -250,7 +251,7 @@ class Employe implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setRoles(array $roles): self
     {
-        $this->roles = $roles;
+        $this->roles = array_values($roles);
         return $this;
     }
 

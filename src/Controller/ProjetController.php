@@ -17,12 +17,14 @@ final class ProjetController extends AbstractController
     public function __construct(
         private ProjetRepository $projetRepository,
         private EntityManagerInterface $entityManager,
-    ){}
+    ){
+    }
 
     #[Route('/projet', name: 'projet.index')]
     public function index(): Response
     {
-        $projets = $this->projetRepository->findNonArchives();
+        $user = $this->getUser();
+        $projets = $this->projetRepository->findNonArchivesByEmploye($user);
         return $this->render('projet/index.html.twig', [
             'projets' => $projets,
         ]);

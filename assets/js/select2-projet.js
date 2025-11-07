@@ -28,6 +28,15 @@ $(document).ready(function() {
                 },
             },
         });
+        document.addEventListener('DOMContentLoaded', function () {
+            // Activation Select2 sur le champ "roles"
+            $('.select2-role').select2({
+                width: 'resolve',
+                minimumResultsForSearch: Infinity, // pas de barre de recherche
+                placeholder: $('.select2-role').data('placeholder'),
+                theme: 'bootstrap-5' // si tu veux le thème Bootstrap
+            });
+        });
 
         // Pré-sélection des employés existants
         /*const selectedOptions = $select.find('option:selected');

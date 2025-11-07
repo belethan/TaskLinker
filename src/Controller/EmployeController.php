@@ -36,11 +36,13 @@ final class EmployeController extends AbstractController
                          UserPasswordHasherInterface $passwordHasher
     ): Response
     {
-        // 🔒 Récupération de l'utilisateur connecté
+        // Récupération de l'utilisateur connecté
         $user = $this->getUser();
 
-        // ⚠️ Vérification : seul le propriétaire de la fiche peut la modifier
-        if ($user->getId() !== $employes->getId()) {
+        //  Vérification : seul le propriétaire de la fiche peut la modifier
+        $isOwner = $user->getId() === $employe->getId();
+        $isAdmin = in_array('ROLE_ADMIN', $user->getRoles(), true);
+        if (!$isOwner && !$isAdmin){
             $this->addFlash('danger', 'Vous ne pouvez pas modifier le profil d’un autre employé.');
             return $this->redirectToRoute('employe'); // redirection vers la liste
         }
@@ -48,6 +50,7 @@ final class EmployeController extends AbstractController
         // création du formulaire
         $formEmploye = $this->createForm(EmployeType::class, $employe);
         // traitement du formulaire pour mettre à jour les champs dans le cas ou redirige vers le formulaire
+
         $formEmploye->handleRequest($request);
         // bloc de validation
         if ($formEmploye->isSubmitted() && $formEmploye->isValid()) {
@@ -63,7 +66,7 @@ final class EmployeController extends AbstractController
         }
         return $this->render('employe/edit.html.twig', [
             'employe' => $employe,
-            'formEmploye' => $formEmploye,
+            'formEmploye' => $formEmploye->createView(),
         ]);
     }
 
